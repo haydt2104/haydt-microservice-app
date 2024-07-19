@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  db:
-    image: mysql:8.0.38
+  mysql:
+    image: mysql:latest
     container_name: mysql_container
     environment:
       MYSQL_ROOT_PASSWORD: haydt123
@@ -16,32 +16,32 @@ services:
     networks:
       - test_network
 
-  app:
+  test-service:
     build:
       context: ./test-service
       dockerfile: Dockerfile
     image: test-service-image:v1
     container_name: test-service-container
     depends_on:
-      - db
+      - mysql
     ports:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/hay_data
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hay_data
       SPRING_DATASOURCE_USERNAME: haydt
       SPRING_DATASOURCE_PASSWORD: haydt123
     networks:
       - test_network
 
-  angular:
+  test-angular:
     build:
       context: ./test-angular
       dockerfile: Dockerfile
     image: angular-app-image:v1
     container_name: angular-app-container
     depends_on:
-      - app
+      - test-service
     ports:
       - "80:80"
     networks:
