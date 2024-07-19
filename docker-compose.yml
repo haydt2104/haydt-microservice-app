@@ -40,6 +40,8 @@ services:
       dockerfile: Dockerfile
     image: angular-app-image:v1
     container_name: angular-app-container
+    depends_on:
+      - app
     ports:
       - "80:80"
     networks:
