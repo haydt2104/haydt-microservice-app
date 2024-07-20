@@ -6,7 +6,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.haydt.entities.User;
@@ -14,7 +13,6 @@ import com.haydt.services.UserService;
 
 import java.util.List;
 
-@RequestMapping("/users")
 @RestController
 public class UserController {
 
@@ -38,6 +36,18 @@ public class UserController {
         List<User> users = userService.allUsers();
 
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/api/v1")
+    public ResponseEntity<?> user() {
+
+        return ResponseEntity.ok("You have role User");
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<?> admin() {
+
+        return ResponseEntity.ok("You have role Admin");
     }
 
 }
