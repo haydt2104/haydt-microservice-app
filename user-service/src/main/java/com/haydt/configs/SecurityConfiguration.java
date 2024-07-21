@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.haydt.exceptions.CustomAccessDeniedHandler;
+import com.haydt.exceptions.CustomAuthenticationEntryPoint;
 import com.haydt.filters.JwtAuthenticationFilter;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public class SecurityConfiguration {
 
         @Autowired
         private CustomAccessDeniedHandler accessDeniedHandler;
+
+        @Autowired
+        private CustomAuthenticationEntryPoint authenticationEntryPoint;
 
         public SecurityConfiguration(
                         JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -47,6 +51,8 @@ public class SecurityConfiguration {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .exceptionHandling(exceptions -> exceptions
                                                 .accessDeniedHandler(accessDeniedHandler))
+                                .exceptionHandling(exceptions -> exceptions
+                                                .authenticationEntryPoint(authenticationEntryPoint))
                                 .authenticationProvider(authenticationProvider)
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
