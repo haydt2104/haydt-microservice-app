@@ -50,4 +50,10 @@ public class UserController {
         return ResponseEntity.ok("You have role Admin");
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<?> user2() {
+
+        return ResponseEntity.ok("Success");
+    }
+
 }
