@@ -1,0 +1,44 @@
+# Go binary
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build files
+*.test
+*.out
+*.log
+
+# Vendor directory (if you're using Go modules, this is often excluded)
+vendor/
+
+/docs
+
+# IDE/editor specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Go module cache
+go.sum
+go.mod
+
+# Coverage output
+*.cov
+
+# Miscellaneous
+*.tgz
+*.zip
+*.tar
+*.rar
+
+# MacOS specific
+.DS_Store
+
+# Linux specific
+*~
+
+# Windows specific
+Thumbs.db
