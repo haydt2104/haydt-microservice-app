@@ -14,14 +14,14 @@ import (
 // @host localhost:7070
 // @BasePath /
 func main() {
-    // Initialize the database
-    database.Initialize()
+	// Initialize the database
+	database.Initialize()
 
-    r := gin.Default()
+	r := gin.Default()
 
-    // Đăng ký các route
-    routes.SetupRoutes(r)
+	// Đăng ký các route
+	routes.SetupRoutes(r)
 
-    // Chạy server trên cổng 8080
-    r.Run(":7070")
+	// Chạy server trên cổng 8080
+	r.Run(":7070")
 }
