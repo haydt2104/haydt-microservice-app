@@ -15,11 +15,10 @@ import (
 // @Failure 500 {object} map[string]interface{}
 // @Router /test [get]
 func TestHandler(c *gin.Context) {
-    response := map[string]interface{}{
-        "status":  "success",
-        "message": "Hello, World!",
-    }
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "Hello, World!",
+	}
 
-    c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, response)
 }
-
