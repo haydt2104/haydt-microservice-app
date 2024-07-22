@@ -16,16 +16,16 @@ services:
     networks:
       - service_network
 
-  user_service:
+  test-service:
     build:
-      context: ./user-service
+      context: ./test-service
       dockerfile: Dockerfile
-    image: user_service_image
-    container_name: user_service_container
+    image: test-service-image:v1
+    container_name: test-service-container
     depends_on:
       - mysql
     ports:
-      - "8888:8080"
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hay_data
@@ -34,21 +34,21 @@ services:
     networks:
       - service_network
 
-  main_webapp_fe:
+  test-angular:
     build:
-      context: ./main-webapp-fe
+      context: ./test-angular
       dockerfile: Dockerfile
-    image: main_webapp_fe_image
-    container_name: main_webapp_fe_container
+    image: angular-app-image:v1
+    container_name: angular-app-container
     depends_on:
-      - user_service
+      - test-service
     ports:
       - "80:80"
     networks:
       - service_network
 
 networks:
-  service_network_network:
+  service_network:
     driver: bridge
 
 volumes:
