@@ -48,7 +48,7 @@ services:
       - service_network
 
 networks:
-  service_network_network:
+  service_network:
     driver: bridge
 
 volumes:
