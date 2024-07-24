@@ -1,9 +1,7 @@
 package com.haydt.services.implement;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -28,74 +26,58 @@ public class RedisServiceImplement implements RedisService {
 
     @Override
     public void saveToken(String email, String token, long expiration) throws Exception {
-        // Lấy danh sách token hiện tại từ Redis
-        String tokensJson = (String) valueOps.get(email);
 
-        System.out.println("List token save: " + tokensJson);
+        // Tạo một đối tượng RedisRefreshTokenModel với token và thời gian hết hạn
+        RedisRefreshTokenModel refreshToken = new RedisRefreshTokenModel(
+                token,
+                expiration,
+                new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));
 
-        List<RedisRefreshTokenModel> tokens;
-        if (tokensJson != null) {
-            // Nếu đã có dữ liệu, chuyển đổi từ JSON sang List
-            tokens = objectMapper.readValue(tokensJson, new TypeReference<List<RedisRefreshTokenModel>>() {
-            });
-        } else {
-            // Nếu chưa có, tạo danh sách mới
-            tokens = new ArrayList<>();
-        }
+        // Chuyển đổi đối tượng sang JSON
+        String tokenJson = objectMapper.writeValueAsString(refreshToken);
 
-        // Thêm token mới vào danh sách
-        tokens.add(new RedisRefreshTokenModel(token, expiration,
-                new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
-
-        // Chuyển đổi danh sách sang JSON
-        String updatedTokensJson = objectMapper.writeValueAsString(tokens);
-
-        // Lưu danh sách token cập nhật vào Redis
-        valueOps.set(email, updatedTokensJson);
+        // Lưu đối tượng token dưới dạng JSON vào Redis
+        valueOps.set(email, tokenJson);
 
     }
 
     @Override
     // Lấy tất cả token của user
-    public List<RedisRefreshTokenModel> getUserTokens(String email) throws Exception {
+    public RedisRefreshTokenModel getUserTokens(String email) throws Exception {
         // Lấy danh sách token hiện tại từ Redis
         String tokensJson = (String) valueOps.get(email);
 
         System.out.println("List token: " + tokensJson);
 
         if (tokensJson == null) {
-            return new ArrayList<>(); // Trả về danh sách rỗng nếu không có dữ liệu
+            return null; // Trả về danh sách rỗng nếu không có dữ liệu
         }
 
         // Chuyển đổi từ JSON sang List
-        return objectMapper.readValue(tokensJson, new TypeReference<List<RedisRefreshTokenModel>>() {
+        return objectMapper.readValue(tokensJson, new TypeReference<RedisRefreshTokenModel>() {
         });
     }
 
     @Override
-    public boolean deleteToken(String username, String token) throws JsonProcessingException {
-        // Lấy danh sách token hiện tại từ Redis
-        String tokensJson = (String) valueOps.get(username);
+    public boolean deleteToken(String email, String token) throws JsonProcessingException {
+        // Lấy token JSON hiện tại từ Redis
+        String tokenJson = (String) valueOps.get(email);
 
-        if (tokensJson == null) {
+        if (tokenJson == null) {
             return false; // Không có token để xóa
         }
 
-        // Chuyển đổi từ JSON sang List
-        List<RedisRefreshTokenModel> tokens = objectMapper.readValue(tokensJson,
-                new TypeReference<List<RedisRefreshTokenModel>>() {
-                });
+        // Chuyển đổi từ JSON sang đối tượng RedisRefreshTokenModel
+        RedisRefreshTokenModel storedToken = objectMapper.readValue(tokenJson, RedisRefreshTokenModel.class);
 
-        // Xóa token nếu tồn tại
-        boolean removed = tokens.removeIf(t -> t.getToken().equals(token));
-
-        if (removed) {
-            // Cập nhật lại danh sách nếu token bị xóa
-            String updatedTokensJson = objectMapper.writeValueAsString(tokens);
-            valueOps.set(username, updatedTokensJson);
+        // Kiểm tra token có khớp không
+        if (storedToken.getToken().equals(token)) {
+            // Nếu khớp, xóa token
+            valueOps.getOperations().delete(email);
+            return true;
         }
 
-        return removed;
+        return false;
     }
 
 }

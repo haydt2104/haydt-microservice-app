@@ -1,7 +1,5 @@
 package com.haydt.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -72,6 +70,7 @@ public class AuthenticationController {
         loginResponse.setExpiresIn(jwtUtil.getAccessExpirationTime());
         loginResponse.setEmail(authenticatedUser.getEmail());
         loginResponse.setStatus(HttpStatus.OK.value());
+        loginResponse.setMessage("Login successful");
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(loginResponse);
     }
 
@@ -86,8 +85,8 @@ public class AuthenticationController {
 
     @PostMapping("/token")
     public ResponseEntity<?> getMethodName(@RequestBody GetTokenRequestDTO email) throws Exception {
-        List<RedisRefreshTokenModel> tokens = redisService.getUserTokens(email.getEmail());
-        return ResponseEntity.ok(tokens);
+        RedisRefreshTokenModel token = redisService.getUserTokens(email.getEmail());
+        return ResponseEntity.ok(token);
     }
 
 }
