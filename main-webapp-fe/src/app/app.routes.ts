@@ -1,3 +1,5 @@
+import { SignUpComponent } from './auth/signup/signup.component';
+import { SignInComponent } from './auth/signin/signin.component';
 import { Routes } from '@angular/router';
 import { HomeComponent } from './user/home/home.component';
 import { AdminComponent } from './admin/admin/admin.component';
@@ -28,6 +30,19 @@ export const routes: Routes = [
             component: ChildUserManagementComponent,
           },
         ],
+      },
+    ],
+  },
+  {
+    path: 'auth',
+    children: [
+      {
+        path: 'sign-in',
+        component: SignInComponent,
+      },
+      {
+        path: 'sign-up',
+        component: SignUpComponent,
       },
     ],
   },
