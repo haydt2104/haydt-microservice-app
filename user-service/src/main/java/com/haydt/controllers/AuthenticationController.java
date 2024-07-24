@@ -1,7 +1,10 @@
 package com.haydt.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.haydt.dtos.requests.GetTokenRequestDTO;
 import com.haydt.dtos.requests.LoginRequestDTO;
 import com.haydt.dtos.requests.RegisterRequestDTO;
 import com.haydt.dtos.responses.LoginResponseDTO;
 import com.haydt.entities.User;
+import com.haydt.models.RedisRefreshTokenModel;
 import com.haydt.repositories.UserRepository;
 import com.haydt.services.AuthenticationService;
+import com.haydt.services.RedisService;
 import com.haydt.utilities.JwtUtil;
 
 @RequestMapping("/auth")
@@ -22,16 +28,19 @@ import com.haydt.utilities.JwtUtil;
 public class AuthenticationController {
 
     @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     @Autowired
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private RedisService redisService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO registerUserDto) {
@@ -40,17 +49,30 @@ public class AuthenticationController {
         return ResponseEntity.ok(registeredUser);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/signin")
     public ResponseEntity<LoginResponseDTO> authenticate(@RequestBody LoginRequestDTO loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
 
-        String jwtToken = jwtUtil.generateToken(authenticatedUser);
+        String jwtAccessToken = jwtUtil.generateAccessToken(authenticatedUser);
 
+        ResponseCookie cookie = ResponseCookie.from("access_token", jwtAccessToken)
+                .httpOnly(true)
+                .maxAge(jwtUtil.getAccessExpirationTime() / 1000)
+                .domain("localhost")
+                .path("/")
+                .sameSite("Strict")
+                .build();
+        try {
+            redisService.saveToken(authenticatedUser.getEmail(), jwtAccessToken, jwtUtil.getRefreshExpirationTime());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         LoginResponseDTO loginResponse = new LoginResponseDTO();
-        loginResponse.setToken(jwtToken);
-        loginResponse.setExpiresIn(jwtUtil.getExpirationTime());
-
-        return ResponseEntity.ok(loginResponse);
+        loginResponse.setExpiresIn(jwtUtil.getAccessExpirationTime());
+        loginResponse.setEmail(authenticatedUser.getEmail());
+        loginResponse.setStatus(HttpStatus.OK.value());
+        return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(loginResponse);
     }
 
     @PostMapping("/encrypt")
@@ -61,4 +83,11 @@ public class AuthenticationController {
         });
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
+
+    @PostMapping("/token")
+    public ResponseEntity<?> getMethodName(@RequestBody GetTokenRequestDTO email) throws Exception {
+        List<RedisRefreshTokenModel> tokens = redisService.getUserTokens(email.getEmail());
+        return ResponseEntity.ok(tokens);
+    }
+
 }
