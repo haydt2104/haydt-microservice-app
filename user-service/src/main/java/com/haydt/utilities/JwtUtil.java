@@ -57,7 +57,7 @@ public class JwtUtil {
     }
 
     public long getRefreshExpirationTime() {
-        return jwtAccessExpiration;
+        return jwtRefreshExpiration;
     }
 
     private String buildToken(

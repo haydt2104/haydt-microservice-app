@@ -42,15 +42,11 @@ public class RedisServiceImplement implements RedisService {
     }
 
     @Override
-    // Lấy tất cả token của user
     public RedisRefreshTokenModel getUserTokens(String email) throws Exception {
-        // Lấy danh sách token hiện tại từ Redis
         String tokensJson = (String) valueOps.get(email);
 
-        System.out.println("List token: " + tokensJson);
-
         if (tokensJson == null) {
-            return null; // Trả về danh sách rỗng nếu không có dữ liệu
+            return null;
         }
 
         // Chuyển đổi từ JSON sang List
@@ -64,7 +60,7 @@ public class RedisServiceImplement implements RedisService {
         String tokenJson = (String) valueOps.get(email);
 
         if (tokenJson == null) {
-            return false; // Không có token để xóa
+            return false;
         }
 
         // Chuyển đổi từ JSON sang đối tượng RedisRefreshTokenModel

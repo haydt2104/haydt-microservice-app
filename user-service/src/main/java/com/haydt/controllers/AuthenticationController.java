@@ -56,12 +56,13 @@ public class AuthenticationController {
         ResponseCookie cookie = ResponseCookie.from("access_token", jwtAccessToken)
                 .httpOnly(true)
                 .maxAge(jwtUtil.getAccessExpirationTime() / 1000)
-                .domain("localhost")
                 .path("/")
                 .sameSite("Strict")
+                .secure(false)
                 .build();
         try {
-            redisService.saveToken(authenticatedUser.getEmail(), jwtAccessToken, jwtUtil.getRefreshExpirationTime());
+            redisService.saveToken(authenticatedUser.getEmail(), jwtUtil.generateRefreshToken(authenticatedUser),
+                    jwtUtil.getRefreshExpirationTime());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

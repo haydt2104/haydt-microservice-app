@@ -24,6 +24,7 @@ services:
       - service_network
     volumes:
       - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
 
   user_service:
     build:
@@ -40,8 +41,8 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hay_data
       SPRING_DATASOURCE_USERNAME: haydt
-      SPRING_DATASOURCE_PASSWORD:
-      SPRING_REDIS_HOST: localhost
+      SPRING_DATASOURCE_PASSWORD: haydt123
+      SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
     networks:
       - service_network
