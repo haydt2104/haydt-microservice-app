@@ -1,7 +1,5 @@
 package com.haydt.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -58,12 +56,13 @@ public class AuthenticationController {
         ResponseCookie cookie = ResponseCookie.from("access_token", jwtAccessToken)
                 .httpOnly(true)
                 .maxAge(jwtUtil.getAccessExpirationTime() / 1000)
-                .domain("localhost")
                 .path("/")
                 .sameSite("Strict")
+                .secure(false)
                 .build();
         try {
-            redisService.saveToken(authenticatedUser.getEmail(), jwtAccessToken, jwtUtil.getRefreshExpirationTime());
+            redisService.saveToken(authenticatedUser.getEmail(), jwtUtil.generateRefreshToken(authenticatedUser),
+                    jwtUtil.getRefreshExpirationTime());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -72,6 +71,7 @@ public class AuthenticationController {
         loginResponse.setExpiresIn(jwtUtil.getAccessExpirationTime());
         loginResponse.setEmail(authenticatedUser.getEmail());
         loginResponse.setStatus(HttpStatus.OK.value());
+        loginResponse.setMessage("Login successful");
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(loginResponse);
     }
 
@@ -86,8 +86,8 @@ public class AuthenticationController {
 
     @PostMapping("/token")
     public ResponseEntity<?> getMethodName(@RequestBody GetTokenRequestDTO email) throws Exception {
-        List<RedisRefreshTokenModel> tokens = redisService.getUserTokens(email.getEmail());
-        return ResponseEntity.ok(tokens);
+        RedisRefreshTokenModel token = redisService.getUserTokens(email.getEmail());
+        return ResponseEntity.ok(token);
     }
 
 }
