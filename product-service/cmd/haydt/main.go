@@ -23,5 +23,5 @@ func main() {
 	routes.SetupRoutes(r)
 
 	// Chạy server trên cổng 8080
-	r.Run(":7070")
+	r.Run(":8082")
 }

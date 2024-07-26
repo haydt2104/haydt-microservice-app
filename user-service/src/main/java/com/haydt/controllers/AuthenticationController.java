@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.haydt.dtos.requests.GetTokenRequestDTO;
 import com.haydt.dtos.requests.LoginRequestDTO;
@@ -21,8 +19,7 @@ import com.haydt.services.AuthenticationService;
 import com.haydt.services.RedisService;
 import com.haydt.utilities.JwtUtil;
 
-@RequestMapping("/auth")
-@RestController
+@BaseController
 public class AuthenticationController {
 
     @Autowired
@@ -40,14 +37,14 @@ public class AuthenticationController {
     @Autowired
     private RedisService redisService;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO registerUserDto) {
         User registeredUser = authenticationService.signup(registerUserDto);
 
         return ResponseEntity.ok(registeredUser);
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/auth/signin")
     public ResponseEntity<LoginResponseDTO> authenticate(@RequestBody LoginRequestDTO loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
 
@@ -75,7 +72,7 @@ public class AuthenticationController {
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(loginResponse);
     }
 
-    @PostMapping("/encrypt")
+    @PostMapping("/public/encrypt")
     public ResponseEntity<?> getMethodName(@RequestBody LoginRequestDTO data) {
         userRepository.findByEmail(data.getEmail()).ifPresent(user -> {
             user.setPassword(passwordEncoder.encode(data.getPassword()));
@@ -84,7 +81,7 @@ public class AuthenticationController {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
-    @PostMapping("/token")
+    @PostMapping("public/token")
     public ResponseEntity<?> getMethodName(@RequestBody GetTokenRequestDTO email) throws Exception {
         RedisRefreshTokenModel token = redisService.getUserTokens(email.getEmail());
         return ResponseEntity.ok(token);

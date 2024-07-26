@@ -49,7 +49,7 @@ public class JwtUtil {
     }
 
     public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtAccessExpiration);
+        return buildToken(extraClaims, userDetails, jwtRefreshExpiration);
     }
 
     public long getAccessExpirationTime() {

@@ -1,6 +1,7 @@
 package com.haydt.configs;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -25,6 +26,9 @@ public class SecurityConfiguration {
         private final AuthenticationProvider authenticationProvider;
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+        @Value("${user-service.api.version}")
+        private String apiVersion;
+
         @Autowired
         private CustomAccessDeniedHandler accessDeniedHandler;
 
@@ -43,9 +47,11 @@ public class SecurityConfiguration {
                 http.csrf(csrf -> csrf.disable())
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(authz -> authz
-                                                .requestMatchers("/auth/**").permitAll()
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                // .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers("/api/" + apiVersion + "/auth/**",
+                                                                "/api/" + apiVersion + "/public/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/" + apiVersion + "/admin/**")
+                                                .hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -62,7 +68,7 @@ public class SecurityConfiguration {
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(List.of("http://localhost:4200/"));
+                configuration.setAllowedOrigins(List.of("http://localhost:4200/", "http://localhost/"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
                 configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);
