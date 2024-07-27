@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
-    @GetMapping("/me")
+    @GetMapping("public/me")
     public ResponseEntity<User> authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -30,26 +30,26 @@ public class UserController {
         return ResponseEntity.ok(currentUser);
     }
 
-    @GetMapping("/getAllUsers")
+    @GetMapping("public/getAllUsers")
     public ResponseEntity<List<User>> allUsers() {
         List<User> users = userService.allUsers();
 
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/user")
+    @GetMapping("public/user")
     public ResponseEntity<?> user() {
 
         return ResponseEntity.ok("You have role User");
     }
 
-    @GetMapping("/admin")
+    @GetMapping("public/admin")
     public ResponseEntity<?> admin() {
 
         return ResponseEntity.ok("You have role Admin");
     }
 
-    @GetMapping("/user2")
+    @GetMapping("public/user2")
     public ResponseEntity<?> user2() {
 
         return ResponseEntity.ok("Success");
