@@ -6,9 +6,14 @@
       "description": "A description for 'user-service.api.version'"
     },
     {
-      "name": "api.gateway.secret",
+      "name": "secret.jwt",
       "type": "java.lang.String",
-      "description": "A description for 'api.gateway.secret'"
+      "description": "A description for 'secret.jwt'"
+    },
+    {
+      "name": "secret.signature",
+      "type": "java.lang.String",
+      "description": "A description for 'secret.jwt'"
     }
   ]
 }

@@ -42,6 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
+        final String signatureHeader = request.getHeader("X-Signature");
+
+        System.out.println("Filtering request to: " + request.getRequestURI());
+
+        if (signatureHeader != null) {
+            System.out.println("Signature: " + signatureHeader);
+        }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
