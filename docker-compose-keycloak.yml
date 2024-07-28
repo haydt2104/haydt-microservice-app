@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  postgresql:
+    image: bitnami/postgresql:16
+    container_name: postgresql_container
+    restart: always
+    environment:
+      POSTGRESQL_USERNAME: haydt
+      POSTGRESQL_PASSWORD: haydt123
+      POSTGRESQL_DATABASE: keycloak
+      POSTGRESQL_POSTGRES_PASSWORD: haydt123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/bitnami/postgresql
+    networks:
+      - service_network
+  keycloak:
+    image: bitnami/keycloak:24
+    container_name: keycloak_container
+    environment:
+      KEYCLOAK_ADMIN: haydt
+      KEYCLOAK_ADMIN_PASSWORD: haydt123
+      KEYCLOAK_DATABASE_HOST: postgresql
+      KEYCLOAK_DATABASE_PORT: 5432
+      KEYCLOAK_DATABASE_VENDOR: postgresql
+      KEYCLOAK_DATABASE_USER: haydt
+      KEYCLOAK_DATABASE_PASSWORD: haydt123
+      KEYCLOAK_DATABASE_NAME: keycloak
+      KEYCLOAK_HTTP_PORT: 8888
+      KEYCLOAK_HTTPS_PORT: 9999
+    depends_on:
+      - postgresql
+    ports:
+      - 8000:8888
+      - 9999:9999
+
+    networks:
+      - service_network
+
+networks:
+  service_network:
+    driver: bridge
+
+volumes:
+  postgresql_data:

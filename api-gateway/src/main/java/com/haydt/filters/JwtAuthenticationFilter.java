@@ -25,10 +25,10 @@ public class JwtAuthenticationFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         SignatureUtil signatureUtil = new SignatureUtil();
         System.out.println("Filtering request to: " + request.getURI().getPath());
-        // Bỏ qua các yêu cầu đến các đường dẫn cụ thể
-        if (request.getURI().getPath().startsWith("/user/auth/")
-                || request.getURI().getPath().startsWith("/user/public/")) {
 
+        String token = getTokenFromCookie(request).orElse(null);
+
+        if (token == null) {
             ServerHttpRequest modifiedRequest;
             try {
                 modifiedRequest = request.mutate()
@@ -41,20 +41,8 @@ public class JwtAuthenticationFilter implements WebFilter {
                 return chain.filter(modifiedExchange);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                return onError(exchange, "Error generating signature", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            try {
-                System.out.println("Signature: " + signatureUtil.generateSignature());
-            } catch (Exception e) {
-                return onError(exchange, "Authorization token is invalid", HttpStatus.UNAUTHORIZED);
-            }
-        }
-
-        String token = getTokenFromCookie(request).orElse(null);
-
-        if (token == null) {
-            return onError(exchange, "JWT token is missing", HttpStatus.UNAUTHORIZED);
         }
 
         try {
