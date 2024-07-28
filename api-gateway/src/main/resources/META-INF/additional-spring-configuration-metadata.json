@@ -14,6 +14,16 @@
       "name": "secret.signature",
       "type": "java.lang.String",
       "description": "A description for 'secret.jwt'"
+    },
+    {
+      "name": "security.oauth2.resoureserver.issuer-uri",
+      "type": "java.lang.String",
+      "description": "A description for 'security.oauth2.resoureserver.issuer-uri'"
+    },
+    {
+      "name": "security.oauth2.resoureserver.jwt.jwk-set-uri",
+      "type": "java.lang.String",
+      "description": "A description for 'security.oauth2.resoureserver.jwt.jwk-set-uri'"
     }
   ]
 }

@@ -16,7 +16,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.haydt.exceptions.CustomAccessDeniedHandler;
 import com.haydt.exceptions.CustomAuthenticationEntryPoint;
-import com.haydt.filters.JwtAuthenticationFilter;
+import com.haydt.filters.SignatureAuthenticationFilter;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration {
         private final AuthenticationProvider authenticationProvider;
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final SignatureAuthenticationFilter signatureAuthenticationFilter;
 
         @Value("${user-service.api.version}")
         private String apiVersion;
@@ -36,10 +36,10 @@ public class SecurityConfiguration {
         private CustomAuthenticationEntryPoint authenticationEntryPoint;
 
         public SecurityConfiguration(
-                        JwtAuthenticationFilter jwtAuthenticationFilter,
+                        SignatureAuthenticationFilter signatureAuthenticationFilter,
                         AuthenticationProvider authenticationProvider) {
                 this.authenticationProvider = authenticationProvider;
-                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.signatureAuthenticationFilter = signatureAuthenticationFilter;
         }
 
         @Bean
@@ -47,12 +47,7 @@ public class SecurityConfiguration {
                 http.csrf(csrf -> csrf.disable())
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .authorizeHttpRequests(authz -> authz
-                                                .requestMatchers("/api/" + apiVersion + "/auth/**",
-                                                                "/api/" + apiVersion + "/public/**")
-                                                .permitAll()
-                                                .requestMatchers("/api/" + apiVersion + "/admin/**")
-                                                .hasRole("ADMIN")
-                                                .anyRequest().authenticated())
+                                                .anyRequest().permitAll())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .exceptionHandling(exceptions -> exceptions
@@ -60,7 +55,8 @@ public class SecurityConfiguration {
                                 .exceptionHandling(exceptions -> exceptions
                                                 .authenticationEntryPoint(authenticationEntryPoint))
                                 .authenticationProvider(authenticationProvider)
-                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                .addFilterBefore(signatureAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
                 return http.build();
         }
 
