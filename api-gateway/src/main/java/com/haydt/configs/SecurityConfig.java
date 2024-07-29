@@ -2,25 +2,21 @@ package com.haydt.configs;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
-import com.haydt.filters.JwtAuthenticationFilter;
-
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${user-service.api.version}")
     private String apiVersion;
@@ -32,7 +28,10 @@ public class SecurityConfig {
                 .authorizeExchange(authz -> authz
                         .pathMatchers("/user/auth/**", "/user/public/**").permitAll()
                         .anyExchange().authenticated())
-                .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(Customizer.withDefaults())
+                        .jwt(jwt -> jwt.jwkSetUri(
+                                "http://localhost:8000/realms/haydt-microservices/protocol/openid-connect/certs")));
         return http.build();
 
     }
