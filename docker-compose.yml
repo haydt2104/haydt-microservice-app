@@ -13,7 +13,7 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
       - service_network
   redis:
@@ -87,6 +87,7 @@ networks:
     name: service_network
 
 volumes:
-  db_data:
+  mysql_data:
+    name: mysql_data
   redis_data:
-  postgresql_data:
+    name: redis_data

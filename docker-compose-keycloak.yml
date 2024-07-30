@@ -41,7 +41,9 @@ services:
 
 networks:
   service_network:
+    name: service_network
     driver: bridge
 
 volumes:
   postgresql_data:
+    name: postgresql_data
