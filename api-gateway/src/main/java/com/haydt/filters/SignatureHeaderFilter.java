@@ -56,9 +56,5 @@ public class SignatureHeaderFilter extends AbstractGatewayFilterFactory<Signatur
 
     // Lớp Config dùng để cấu hình cho filter, có thể mở rộng nếu cần thiết
     public static class Config {
-        // Thêm các tham số cấu hình nếu cần, ví dụ:
-        // private boolean shouldAddSignature;
-
-        // Getters và Setters nếu cần cấu hình
     }
 }

@@ -84,6 +84,7 @@ services:
 networks:
   service_network:
     driver: bridge
+    name: service_network
 
 volumes:
   db_data:
